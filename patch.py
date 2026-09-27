@@ -1,4 +1,4 @@
-"""Version-locked local patcher. Game files and third-party binaries are not bundled."""
+"""Local patcher with advisory version hashes. Game and third-party binaries are not bundled."""
 from __future__ import annotations
 
 import argparse
@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import re
 import tempfile
+import warnings
 
 ORIGINAL_SHA256 = "2c7a2231df58d82d9eba7b80038641ad716918f3159540c1f3d1a128d2e361f8"
 PATCHED_SHA256 = "c5bf3867b8617280f2c91c1b7f4ac183202923a200fcff0e414d36c6adb07847"
@@ -26,6 +27,21 @@ class PatchError(Exception):
     pass
 
 
+class CompatibilityWarning(UserWarning):
+    """An input differs from the tested build; applying the patch is still allowed."""
+
+
+def warn_hash(data: bytes, expected: str, label: str) -> None:
+    actual = digest(data)
+    if actual != expected:
+        warnings.warn(
+            label + " SHA-256 differs from the tested build (" + actual
+            + "). Continuing; compatibility is unverified.",
+            CompatibilityWarning,
+            stacklevel=2,
+        )
+
+
 def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
@@ -37,17 +53,28 @@ def verify_archives(game: Path) -> None:
             for block in iter(lambda: stream.read(4 * 1024 * 1024), b""):
                 checksum.update(block)
         if checksum.hexdigest() != expected:
-            raise PatchError("Unsupported game archive: " + name + ". Only the documented Steam build is supported.")
+            warnings.warn(
+                name + " SHA-256 differs from the tested Steam build. Continuing; compatibility is unverified.",
+                CompatibilityWarning, stacklevel=2,
+            )
+
+
+def executable_state(data: bytes) -> str:
+    marker = data[OFFSET:OFFSET + len(OLD)]
+    if marker == OLD:
+        return "original"
+    if marker == NEW:
+        return "patched"
+    raise PatchError("Font bytes at the patch offset do not match either known state; cannot locate a safe edit.")
 
 
 def patch_executable(data: bytes) -> bytes:
-    if digest(data) != ORIGINAL_SHA256:
-        raise PatchError("Unsupported EXE. This patch only supports the documented SHA-256. No force mode exists.")
-    if data[OFFSET:OFFSET + len(OLD)] != OLD:
-        raise PatchError("Font bytes do not match the expected version.")
+    state = executable_state(data)
+    if state == "patched":
+        warn_hash(data, PATCHED_SHA256, "Already-patched EXE")
+        return data
+    warn_hash(data, ORIGINAL_SHA256, "Original EXE")
     result = data[:OFFSET] + NEW + data[OFFSET + len(OLD):]
-    if digest(result) != PATCHED_SHA256:
-        raise PatchError("Patched EXE verification failed.")
     return result
 
 
@@ -107,33 +134,35 @@ def game_path(folder: Path) -> Path:
 def check(folder: Path) -> str:
     game = game_path(folder)
     verify_archives(game)
-    current = digest((game / EXE).read_bytes())
-    if current == ORIGINAL_SHA256:
+    data = (game / EXE).read_bytes()
+    state = executable_state(data)
+    if state == "original":
+        warn_hash(data, ORIGINAL_SHA256, "Original EXE")
         patch_config((game / CONFIG).read_bytes())
-        return "Supported original EXE. No files changed."
-    if current == PATCHED_SHA256:
-        if not (game / PLUGIN).is_file() or digest((game / PLUGIN).read_bytes()) != PLUGIN_SHA256:
-            raise PatchError("EXE is patched, but the expected plugin is missing or different.")
+        return "Patch location recognized. No files changed. Hash differences are warnings only."
+    if state == "patched":
+        warn_hash(data, PATCHED_SHA256, "Already-patched EXE")
+        if not (game / PLUGIN).is_file():
+            raise PatchError("EXE is patched, but the plugin is missing.")
+        warn_hash((game / PLUGIN).read_bytes(), PLUGIN_SHA256, "Installed plugin")
         if patch_config((game / CONFIG).read_bytes()) != (game / CONFIG).read_bytes():
             raise PatchError("EXE is patched, but readencoding is not configured.")
-        return "Expected patched EXE, plugin, and configuration are present. Gameplay is not verified by this check."
-    raise PatchError("Unsupported EXE SHA-256: " + current)
+        return "Patched font bytes, plugin, and configuration are present. Gameplay is not verified by this check."
 
 
 def install(folder: Path, plugin_file: Path) -> str:
     game = game_path(folder)
-    if digest((game / EXE).read_bytes()) == PATCHED_SHA256:
+    if executable_state((game / EXE).read_bytes()) == "patched":
         return check(game)
     verify_archives(game)
     backup = game / BACKUP
     if backup.exists():
         raise PatchError("A backup already exists. Restore or inspect it before installing again; it will not be overwritten.")
     plugin = plugin_file.read_bytes()
-    if digest(plugin) != PLUGIN_SHA256:
-        raise PatchError("Wrong plugin. Obtain utf8hack.intel32.clang.7z from upstream v1.2.0 and extract utf8hack.dll.")
+    warn_hash(plugin, PLUGIN_SHA256, "Selected plugin")
     before = {name: (game / name).read_bytes() if (game / name).exists() else None for name in FILES}
-    if before[PLUGIN] is not None and digest(before[PLUGIN]) != PLUGIN_SHA256:
-        raise PatchError("A different utf8hack.tpm already exists; refusing to overwrite it.")
+    if before[PLUGIN] is not None and before[PLUGIN] != plugin:
+        warnings.warn("The existing utf8hack.tpm differs from the selected plugin; it will be backed up and replaced.", CompatibilityWarning, stacklevel=2)
     after = {EXE: patch_executable(before[EXE]), CONFIG: patch_config(before[CONFIG]), PLUGIN: plugin}
     backup.mkdir()
     for name, data in before.items():
@@ -218,7 +247,13 @@ def interactive(action: str) -> None:
                 return
             if not messagebox.askyesno("Apply compatibility patch", "Close the game first. Back up the original files and apply the three-file patch? Windows locale and saves stay unchanged."):
                 return
-            result = install(Path(folder), Path(plugin))
+            with warnings.catch_warnings(record=True) as notices:
+                warnings.simplefilter("always", CompatibilityWarning)
+                result = install(Path(folder), Path(plugin))
+            if notices:
+                details = "\n\n".join(dict.fromkeys(str(item.message) for item in notices))
+                messagebox.showwarning("Patch completed with compatibility warnings", result + "\n\n" + details)
+                return
         messagebox.showinfo("Unicode startup fix", result)
     except (PatchError, OSError, ValueError) as exc:
         messagebox.showerror("Patch stopped", str(exc))

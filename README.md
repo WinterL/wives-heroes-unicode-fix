@@ -25,7 +25,7 @@ An **experimental, unofficial** three-file compatibility fix for the Windows Ste
 | System ANSI / OEM code pages | **65001 / 65001 (UTF-8)** |
 | Plugin | utf8hack **v1.2.0**, **intel32.clang** |
 
-The game versions were read from local version metadata used by the title-screen script; they are not a screenshot-based claim. Only this exact Steam dataset was tested. The patcher checks the EXE **and all three game archive hashes** in [supported_versions.json](supported_versions.json) and refuses other builds. Windows 10, other locales and other store versions are unverified. A 64-bit Windows system still needs the **32-bit** plugin because the game is 32-bit.
+The game versions were read from local version metadata used by the title-screen script; they are not a screenshot-based claim. Only this exact Steam dataset was tested. The patcher checks the EXE **and all three game archive hashes** in [supported_versions.json](supported_versions.json) for reference. A mismatch emits a warning and does not block installation; no `--force` option is needed. The expected font bytes must still be present at the edit offset. Windows 10, other locales and other store versions are unverified. A 64-bit Windows system still needs the **32-bit** plugin because the game is 32-bit.
 
 ## Installation for beginners
 
@@ -34,7 +34,7 @@ The game versions were read from local version metadata used by the title-screen
 3. Open [upstream release v1.2.0](https://github.com/uyjulian/utf8hack/releases/tag/v1.2.0). Download **`utf8hack.intel32.clang.7z`** and extract it with [7-Zip](https://www.7-zip.org/) or another compatible extractor. Keep the extracted **`utf8hack.dll`**. The plugin is intentionally not included here.
 4. In Steam, right-click the game → **Manage → Browse local files**. Note that folder; it contains `yuusyatsuma.eXe` and `data.xp3`.
 5. Double-click **`Apply.cmd`** in this repository. In the first picker, select the **game folder**. In the next picker, select the **extracted `utf8hack.dll`**. Confirm the installation. The dialogs are in English. Hash verification may take a little time because it reads all game archives.
-6. The tool automatically backs up the affected original files into **`.unicode-fix-backup`** inside the game folder, then applies the fix. If the version/plugin differs, it stops rather than guessing. Keep the backup.
+6. The tool automatically backs up the affected original files into **`.unicode-fix-backup`** inside the game folder, then applies the fix. If a version or plugin hash differs, it warns and continues. An existing different plugin is backed up before replacement. Keep the backup.
 7. In Steam → game **Properties → General → Launch Options**, remove any old command that redirects to a separate test copy. Leave the field empty for this patch. Click **Play** normally.
 
 No system language change or reboot is required by this patch. The repository contains no game files and does not download/upload anything automatically. Only the selected game folder is modified. Existing `savedata` is untouched; saves from a separate test copy are **not** migrated.
@@ -45,7 +45,7 @@ No system language change or reboot is required by this patch. The repository co
 |---|---|
 | `yuusyatsuma.eXe` | At file offset `0x2C82EA`, replace the CP932 font-name literal `ＭＳ Ｐゴシック` with ASCII `MS PGothic`, padded to the same byte length. All other EXE bytes remain unchanged. |
 | `yuusyatsuma.cf` | Set `readencoding=Shift_JIS`, retaining other settings, encoding, BOM and line endings. The `\xNN` form is KiriKiri's configuration syntax. |
-| `utf8hack.tpm` | Copy the verified upstream DLL under the `.tpm` extension so the engine loads it before scripts. It hooks text reading in memory and decodes scripts with CP932. |
+| `utf8hack.tpm` | Copy the selected upstream DLL under the `.tpm` extension so the engine loads it before scripts. It hooks text reading in memory and decodes scripts with CP932. |
 
 The plugin fixes script decoding, but alone still failed during native Layer initialization in the test. The font literal edit fixes that second conversion. The game archives, translations, save format and Windows code page are not changed. KiriKiri Z was evaluated and hit a separate menu compatibility error, so it is not part of this patch.
 
@@ -54,7 +54,8 @@ The plugin fixes script decoding, but alone still failed during native Layer ini
 - Close the game and run **`Restore.cmd`**; select the same game folder. It restores the backed-up files and removes the added plugin only if no plugin existed before. It preserves savedata and retains the backup.
 - If files changed after patching (for example a Steam update), automatic restore refuses to overwrite them. Keep the backup and inspect the situation first.
 - If a backup already exists after a restore/failed attempt, keep it somewhere safe outside the game folder before applying again. The installer never overwrites an existing backup.
-- Unsupported version/plugin: stop and check the exact build/asset above. There is no force mode.
+- Different version/plugin SHA-256: warning only; installation continues, but compatibility is unverified. CLI warnings appear in the console; the GUI also shows a warning summary after completion.
+- The font bytes at the edit offset must match the original or patched marker. An unrecognized marker still stops the operation. Backup-integrity and restore-conflict checks remain strict; these protect your files rather than enforce a tested-version whitelist.
 - Permission/locked-file error: close the game and check folder write access. The tool attempts to roll back completed writes if installation fails.
 - Steam updates or **Verify integrity** may replace patched files; an added plugin may remain. Do not apply an old patch blindly to a new build.
 - This is an experimental runtime plugin. Do not disable security protection if it is blocked; investigate the report and upstream provenance.

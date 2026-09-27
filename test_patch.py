@@ -41,25 +41,38 @@ class PatchTests(unittest.TestCase):
         self.assertEqual(output[:patch.OFFSET], self.original[:patch.OFFSET])
         self.assertEqual(output[patch.OFFSET + len(patch.OLD):], self.original[patch.OFFSET + len(patch.OLD):])
 
-    def test_unknown_exe_refused_without_backup(self):
-        (self.game / patch.EXE).write_bytes(self.original + b"different version")
-        with self.assertRaises(patch.PatchError):
+    def test_unknown_exe_warns_and_remains_idempotent(self):
+        original = self.original + b"different version"
+        (self.game / patch.EXE).write_bytes(original)
+        with self.assertWarnsRegex(patch.CompatibilityWarning, "Original EXE SHA-256"):
             patch.install(self.game, self.plugin_file)
-        self.assertFalse((self.game / patch.BACKUP).exists())
-        self.assertEqual((self.game / patch.CONFIG).read_bytes(), self.config)
+        expected = self.expected + b"different version"
+        self.assertEqual((self.game / patch.EXE).read_bytes(), expected)
+        with self.assertWarnsRegex(patch.CompatibilityWarning, "Already-patched EXE"):
+            self.assertIn("Patched font bytes", patch.install(self.game, self.plugin_file))
+        patch.restore(self.game)
+        self.assertEqual((self.game / patch.EXE).read_bytes(), original)
 
-    def test_wrong_plugin_refused_without_changes(self):
+    def test_different_plugin_warns_and_installs(self):
         self.plugin_file.write_bytes(b"different plugin")
-        with self.assertRaises(patch.PatchError):
+        with self.assertWarnsRegex(patch.CompatibilityWarning, "Selected plugin SHA-256"):
             patch.install(self.game, self.plugin_file)
-        self.assertFalse((self.game / patch.BACKUP).exists())
-        self.assertEqual((self.game / patch.EXE).read_bytes(), self.original)
+        self.assertEqual((self.game / patch.PLUGIN).read_bytes(), b"different plugin")
+        with self.assertWarnsRegex(patch.CompatibilityWarning, "Installed plugin SHA-256"):
+            patch.check(self.game)
 
-    def test_other_archive_build_refused(self):
+    def test_other_archive_build_warns_and_installs(self):
         (self.game / "patch_2.xp3").write_bytes(b"newer build")
-        with self.assertRaises(patch.PatchError):
+        with self.assertWarnsRegex(patch.CompatibilityWarning, "patch_2.xp3 SHA-256"):
+            patch.install(self.game, self.plugin_file)
+        self.assertEqual((self.game / patch.EXE).read_bytes(), self.expected)
+
+    def test_unrecognized_patch_location_still_refused(self):
+        (self.game / patch.EXE).write_bytes(b"another executable")
+        with self.assertRaisesRegex(patch.PatchError, "patch offset"):
             patch.install(self.game, self.plugin_file)
         self.assertFalse((self.game / patch.BACKUP).exists())
+        self.assertEqual((self.game / patch.EXE).read_bytes(), b"another executable")
 
     def test_config_encodings_newlines_and_idempotence(self):
         for encoding, bom, newline in (("utf-8", b"", "\r\n"), ("utf-8", b"\xef\xbb\xbf", "\n"), ("utf-16-le", b"\xff\xfe", "\r\n"), ("utf-16-be", b"\xfe\xff", "\n")):
@@ -84,7 +97,7 @@ class PatchTests(unittest.TestCase):
         self.assertEqual((backup / patch.CONFIG).read_bytes(), self.config)
         manifest = (backup / "manifest.json").read_text()
         self.assertNotIn(str(self.game), manifest)
-        self.assertIn("Expected patched", patch.install(self.game, self.plugin_file))
+        self.assertIn("Patched font bytes", patch.install(self.game, self.plugin_file))
         patch.restore(self.game)
         patch.restore(self.game)
         self.assertEqual((self.game / patch.EXE).read_bytes(), self.original)
@@ -98,10 +111,13 @@ class PatchTests(unittest.TestCase):
         patch.restore(self.game)
         self.assertEqual((self.game / patch.PLUGIN).read_bytes(), self.plugin)
 
-    def test_unrelated_plugin_is_not_overwritten(self):
+    def test_existing_plugin_warns_and_is_backed_up_and_restored(self):
         (self.game / patch.PLUGIN).write_bytes(b"unrelated plugin")
-        with self.assertRaises(patch.PatchError):
+        with self.assertWarnsRegex(patch.CompatibilityWarning, "backed up and replaced"):
             patch.install(self.game, self.plugin_file)
+        self.assertEqual((self.game / patch.PLUGIN).read_bytes(), self.plugin)
+        self.assertEqual((self.game / patch.BACKUP / patch.PLUGIN).read_bytes(), b"unrelated plugin")
+        patch.restore(self.game)
         self.assertEqual((self.game / patch.PLUGIN).read_bytes(), b"unrelated plugin")
 
     def test_existing_backup_is_preserved(self):
@@ -142,7 +158,7 @@ class PatchTests(unittest.TestCase):
         self.assertFalse((self.game / patch.PLUGIN).exists())
 
     def test_check_is_read_only(self):
-        self.assertIn("Supported original", patch.check(self.game))
+        self.assertIn("Patch location recognized", patch.check(self.game))
         self.assertFalse((self.game / patch.BACKUP).exists())
 
 
@@ -171,7 +187,7 @@ class LocalIntegrationTests(unittest.TestCase):
             with mock_patch.object(patch, "verify_archives"):
                 patch.install(game, plugin)
                 self.assertEqual(patch.digest((game / patch.EXE).read_bytes()), patch.PATCHED_SHA256)
-                self.assertIn("Expected patched", patch.check(game))
+                self.assertIn("Patched font bytes", patch.check(game))
                 patch.restore(game)
             self.assertEqual((game / patch.EXE).read_bytes(), original)
             self.assertEqual((game / patch.CONFIG).read_bytes(), config)

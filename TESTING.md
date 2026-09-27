@@ -12,7 +12,7 @@ The installed Steam manifest reports **App 4358140 / build 25049578**. The game'
 
 These values were read locally from the game's metadata, not inferred from a store release date. The title-screen script formats these values; no title-screen screenshot was captured. The process window title observed during the successful startup probe was `かつて勇者だった妻達へ かつて将軍だった魔王へ　結合版`.
 
-The EXE's **file version `2.32.2.426`** identifies the KiriKiri 2 engine. Its PE product version `1.0.0.0` is not used as the game version. Exact input/output and archive hashes are recorded in [supported_versions.json](supported_versions.json). The installer verifies the EXE and all three archive hashes, not merely filenames or a visible version label. It does not parse the Steam manifest at runtime.
+The EXE's **file version `2.32.2.426`** identifies the KiriKiri 2 engine. Its PE product version `1.0.0.0` is not used as the game version. Exact input/output and archive hashes are recorded in [supported_versions.json](supported_versions.json). The installer compares the EXE, plugin, and all three archive hashes with the tested reference. Differences are compatibility warnings, not installation blockers. It still requires recognizable font bytes at the patch offset. Backup-integrity and restore-conflict checks remain strict. It does not parse the Steam manifest at runtime.
 
 ## Environment
 
@@ -43,8 +43,8 @@ The desktop automation tool could not capture the game window. This establishes 
 
 ## Patcher checks
 
-Run `python -m unittest -v test_patch.py` for synthetic, copyright-free tests: exact version refusal, byte boundaries, preservation of config encoding/newlines, wrong-plugin refusal, backups, rollback, restore conflict detection, idempotence, and protection of unrelated files. These do not run the game. An optional local integration test accepts `PATCH_TEST_GAME_DIR` and `PATCH_TEST_PLUGIN`; it uses a temporary copy of the small files, reads the real archive hashes, and never writes to the supplied game folder. Game assets must never be committed as fixtures.
+Run `python -m unittest -v test_patch.py` for synthetic, copyright-free tests: advisory version/plugin/archive mismatches, byte boundaries, preservation of config encoding/newlines, unknown patch-location refusal, backups, rollback, restore conflict detection, idempotence across unrecognized hashes, and restoration of preexisting plugins. These do not run the game. An optional local integration test accepts `PATCH_TEST_GAME_DIR` (an unmodified installation or retained unmodified test copy) and `PATCH_TEST_PLUGIN`; it uses a temporary copy of the small files, reads the real archive hashes, and never writes to the supplied game folder. Game assets must never be committed as fixtures.
 
-On 2026-09-27, **all 15 tests passed**, including the optional real-file integration test, using Python 3.13.12. The resulting patched EXE matched the previously startup-tested candidate SHA-256 exactly; restoration reproduced the original EXE and configuration byte for byte. This verifies the patcher, not additional gameplay features.
+On 2026-09-27, **all 16 tests passed**, including the optional real-file integration test, using Python 3.13.12. The resulting patched EXE matched the previously startup-tested candidate SHA-256 exactly; restoration reproduced the original EXE and configuration byte for byte. This verifies the patcher, not additional gameplay features.
 
 No raw desktop screenshots, full logs, computer/user names, personal paths, save data, credentials, or game content are included as test artifacts.

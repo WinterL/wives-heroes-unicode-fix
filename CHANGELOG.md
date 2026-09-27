@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 — 2026-09-27 (experimental)
+
+- Change tested-version SHA-256 mismatches for EXEs, game archives, and plugins to warnings; continue without a force flag.
+- Detect original/patched font markers independently of the whole-file hash, keeping repeat installation idempotent for variant builds.
+- Back up and replace an existing different plugin instead of rejecting it.
+- Preserve patch-offset, backup-integrity, and restore-conflict protections.
+- Update all five READMEs and regression tests for the advisory compatibility checks.
+
 ## 0.1.0 — 2026-09-27 (experimental)
 
 - Support only Steam App 4358140 build 25049578 and the documented EXE/archive hashes.
