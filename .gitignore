@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.exe
+*.dll
+*.tpm
+*.xp3
+*.zip
+*.7z
+*.log
+savedata/
+.unicode-fix-backup/
+work/
+.env
+*.tmp

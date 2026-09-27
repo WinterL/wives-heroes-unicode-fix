@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "steam_app_id": 4358140,
+  "steam_build_id": "25049578",
+  "game_title": "To the Wives Who Were Heroes",
+  "japanese_title": "かつて勇者だった妻達へ",
+  "title_metadata_versions": {
+    "base": "0.26.6.22",
+    "patch_1": "1.26.6.12",
+    "patch_2": "2.26.7.23"
+  },
+  "engine_file_version": "2.32.2.426",
+  "engine_pe_product_version": "1.0.0.0",
+  "exe_original_sha256": "2c7a2231df58d82d9eba7b80038641ad716918f3159540c1f3d1a128d2e361f8",
+  "exe_patched_sha256": "c5bf3867b8617280f2c91c1b7f4ac183202923a200fcff0e414d36c6adb07847",
+  "archives_sha256": {
+    "data.xp3": "41b0dc4ebe4f58d2285dcb20d84d45cd7bdbb47f4a0cc08cef4cc2dcab43a3a5",
+    "patch_1.xp3": "204ae741649e2d46f75d4aa186ddab2d4b4f42f58cf1c52da12205141d59aea4",
+    "patch_2.xp3": "87503630e64fda733305e798c636e2f00161beb33bf896fc5602cf6d30fe31a7"
+  },
+  "plugin": {
+    "repository": "https://github.com/uyjulian/utf8hack",
+    "version": "v1.2.0",
+    "asset": "utf8hack.intel32.clang.7z",
+    "asset_sha256": "32b94098dbb27ed1021fb8819e63e39b6592ecc903babb5cb3a68e402db73d5f",
+    "dll_sha256": "e9bd9a1f354b906b16201a24732d8ffd186cadc30e803dcf33281e297671ea69"
+  },
+  "tested_environment": {
+    "os": "Windows 11 Pro",
+    "release": "25H2",
+    "build": "26200.9457",
+    "architecture": "x64",
+    "system_locale": "zh-TW",
+    "user_culture": "zh-TW",
+    "ansi_code_page": 65001,
+    "oem_code_page": 65001,
+    "locale_emulator": false
+  }
+}
