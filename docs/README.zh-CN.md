@@ -2,7 +2,9 @@
 
 [English](../README.md) · [繁體中文](README.zh-TW.md) · 简体中文 · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-非官方补丁，解决 Windows 启用 UTF-8 时游戏启动出现的 ANSI 转 Unicode 错误。[Steam](https://store.steampowered.com/app/4358140/) · [DLsite](https://www.dlsite.com/maniax/work/=/product_id/RJ01464205.html)
+**保留原有系统区域和 UTF-8 设置，不必为这款游戏将系统区域改为日语。**
+
+[Steam 官方说明](https://store.steampowered.com/app/4358140/)要求将系统区域设为日语。本非官方补丁修改三个游戏文件，以 CP932 读取脚本、将字体名称改为 ASCII，解决 ANSI 转 Unicode 的启动错误。[官方排错公告](https://store.steampowered.com/news/app/4358140/view/717917724409331753?l=tchinese) · [DLsite](https://www.dlsite.com/maniax/work/=/product_id/RJ01464205.html)
 
 ## 安装
 
@@ -26,6 +28,6 @@ Steam build **25049578**：本体 **0.26.6.22**、Patch 1 **1.26.6.12**、Patch 
 
 ## 还原与许可
 
-将 [Restore.cmd](../Restore.cmd) 放入游戏文件夹，关闭游戏后运行。请保留 `.unicode-fix-backup`；还原后如需重新应用，先将这份备份移到游戏文件夹外。
+将 [Restore.cmd](../Restore.cmd) 放入游戏文件夹，关闭游戏后运行。还原成功会删除备份，可直接再次应用补丁。
 
 插件：[utf8hack](https://github.com/uyjulian/utf8hack)，原作者 **miahmie**（[原始源码](https://github.com/krkrz/krkr2/tree/master/kirikiri2/trunk/kirikiri2/src/plugins/win32/utf8hack)）。本项目代码与文档采用 [MIT](../LICENSE)；其他许可见[第三方声明](THIRD_PARTY_NOTICES.md)。如有疑虑，请通过 [Issues](https://github.com/WinterL/wives-heroes-unicode-fix/issues) 提出移除请求。

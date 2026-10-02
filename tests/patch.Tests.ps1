@@ -76,6 +76,7 @@ foreach ($existingPlugin in @($false, $true)) {
         $script:Reference.exe_patched_sha256 = Get-BytesHash $patched
         Install-GamePatch $script:Game $script:Plugin
         Restore-GamePatch $script:Game
+        Assert-True (-not (Test-Path -LiteralPath (Join-Path $script:Game $script:BackupName))) 'Successful restore left backup'
         Restore-GamePatch $script:Game
         Assert-True (Test-BytesEqual $script:Original ([IO.File]::ReadAllBytes($script:ExePath))) 'EXE restoration differs'
         Assert-True (Test-BytesEqual $script:Config ([IO.File]::ReadAllBytes($script:ConfigPath))) 'Config restoration differs'
@@ -117,10 +118,12 @@ Invoke-TestCase 'restore preserves later edits and refuses corrupt backups befor
     $patchedConfig = [IO.File]::ReadAllBytes($script:ConfigPath)
     [IO.File]::AppendAllText($script:ConfigPath, '; later change')
     Assert-Throws { Restore-GamePatch $script:Game } 'changed after installation'
+    Assert-True (Test-Path -LiteralPath (Join-Path $script:Game '.unicode-fix-backup\manifest.json')) 'Conflict removed backup'
     Assert-True (Test-BytesEqual $patched ([IO.File]::ReadAllBytes($script:ExePath))) 'Partial restore occurred'
     [IO.File]::WriteAllBytes($script:ConfigPath, $patchedConfig)
     [IO.File]::WriteAllText((Join-Path $script:Game '.unicode-fix-backup\yuusyatsuma.eXe'), 'corrupt')
     Assert-Throws { Restore-GamePatch $script:Game } 'Backup checksum mismatch'
+    Assert-True (Test-Path -LiteralPath (Join-Path $script:Game '.unicode-fix-backup\manifest.json')) 'Corrupt backup was removed'
     Assert-True (Test-BytesEqual $patched ([IO.File]::ReadAllBytes($script:ExePath))) 'Corrupt backup changed EXE'
 }
 Invoke-TestCase 'write failure rolls back earlier changes' {
@@ -137,19 +140,58 @@ if ($env:PATCH_TEST_GAME_DIR -and $env:PATCH_TEST_PLUGIN) {
         [IO.File]::WriteAllBytes($script:ExePath, $exe)
         [IO.File]::WriteAllBytes($script:ConfigPath, $config)
         Copy-Item -LiteralPath $env:PATCH_TEST_PLUGIN -Destination $script:Plugin
-        Invoke-Packaged Apply
-        Assert-True ((Get-FileHash -LiteralPath $script:ExePath).Hash -eq $originalReference.exe_patched_sha256) 'Real patched EXE differs'
-        Invoke-Packaged Restore
-        Assert-True (Test-BytesEqual $exe ([IO.File]::ReadAllBytes($script:ExePath))) 'Real EXE restoration differs'
-        Assert-True (Test-BytesEqual $config ([IO.File]::ReadAllBytes($script:ConfigPath))) 'Real config restoration differs'
+        foreach ($cycle in 1..2) {
+            Invoke-Packaged Apply
+            Assert-True ((Get-FileHash -LiteralPath $script:ExePath).Hash -eq $originalReference.exe_patched_sha256) 'Real patched EXE differs'
+            Invoke-Packaged Restore
+            Assert-True (-not (Test-Path -LiteralPath (Join-Path $script:Game $script:BackupName))) 'Real restore left backup'
+            Assert-True (Test-BytesEqual $exe ([IO.File]::ReadAllBytes($script:ExePath))) 'Real EXE restoration differs'
+            Assert-True (Test-BytesEqual $config ([IO.File]::ReadAllBytes($script:ConfigPath))) 'Real config restoration differs'
+        }
     }
 }
-Invoke-TestCase 'standalone CMD applies, repeats and restores from a different working directory' {
-    Assert-True ((Invoke-Packaged Apply) -match 'Patch installed') 'Packaged apply did not complete'
-    Assert-True ((Invoke-Packaged Apply) -match 'already installed') 'Repeat apply was not idempotent'
-    Invoke-Packaged Restore
-    Assert-True (Test-BytesEqual $script:Original ([IO.File]::ReadAllBytes($script:ExePath))) 'Packaged restore differs'
-    Assert-True (Test-BytesEqual $script:Config ([IO.File]::ReadAllBytes($script:ConfigPath))) 'Packaged config restore differs'
+foreach ($existingPlugin in @($false, $true)) {
+    Invoke-TestCase ('standalone CMD apply/restore/apply/restore; existing plugin=' + $existingPlugin) {
+        $targetPlugin = Join-Path $script:Game 'utf8hack.tpm'
+        if ($existingPlugin) { [IO.File]::WriteAllText($targetPlugin, 'old plugin') }
+        foreach ($cycle in 1..2) {
+            Assert-True ((Invoke-Packaged Apply) -match 'Patch installed') 'Packaged apply did not complete'
+            Assert-True ((Invoke-Packaged Apply) -match 'already installed') 'Repeat apply was not idempotent'
+            Invoke-Packaged Restore
+            Assert-True (-not (Test-Path -LiteralPath (Join-Path $script:Game $script:BackupName))) 'Packaged restore left backup'
+            Assert-True (Test-BytesEqual $script:Original ([IO.File]::ReadAllBytes($script:ExePath))) 'Packaged restore differs'
+            Assert-True (Test-BytesEqual $script:Config ([IO.File]::ReadAllBytes($script:ConfigPath))) 'Packaged config restore differs'
+            if ($existingPlugin) { Assert-True ([IO.File]::ReadAllText($targetPlugin) -eq 'old plugin') 'Packaged restore lost original plugin' }
+            else { Assert-True (-not (Test-Path -LiteralPath $targetPlugin)) 'Packaged restore left new plugin' }
+        }
+        Assert-True ((Invoke-Packaged Restore) -match 'Nothing to restore') 'Repeat restore should do nothing'
+    }
+}
+Invoke-TestCase 'unexpected backup files and null original EXE hash stop restore before writes' {
+    Install-GamePatch $script:Game $script:Plugin
+    $backup = Join-Path $script:Game $script:BackupName
+    $extra = Join-Path $backup 'notes.txt'
+    $patched = [IO.File]::ReadAllBytes($script:ExePath)
+    [IO.File]::WriteAllText($extra, 'user file')
+    Assert-Throws { Restore-GamePatch $script:Game } 'unexpected or missing files'
+    Assert-True ([IO.File]::ReadAllText($extra) -eq 'user file') 'Unexpected file was changed'
+    Remove-Item -LiteralPath $extra
+    $manifestPath = Join-Path $backup 'manifest.json'
+    $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+    $manifest.before.'yuusyatsuma.eXe' = $null
+    [IO.File]::WriteAllText($manifestPath, ($manifest | ConvertTo-Json -Depth 4))
+    Assert-Throws { Restore-GamePatch $script:Game } 'valid backup manifest'
+    Assert-True (Test-BytesEqual $patched ([IO.File]::ReadAllBytes($script:ExePath))) 'Invalid backup changed game'
+}
+Invoke-TestCase 'cleanup failure reconstructs removed backup files and supports retry' {
+    Install-GamePatch $script:Game $script:Plugin
+    $backup = Join-Path $script:Game $script:BackupName
+    $locked = [IO.File]::Open((Join-Path $backup 'yuusyatsuma.cf'), [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::Read)
+    try { Assert-Throws { Restore-GamePatch $script:Game } 'backup retained because cleanup failed' }
+    finally { $locked.Dispose() }
+    Assert-True (Test-BytesEqual $script:Original ([IO.File]::ReadAllBytes((Join-Path $backup 'yuusyatsuma.eXe')))) 'Cleanup failure lost original EXE backup'
+    Restore-GamePatch $script:Game
+    Assert-True (-not (Test-Path -LiteralPath $backup)) 'Retry did not remove backup'
 }
 Invoke-TestCase 'standalone CMD reports a missing DLL and wrong folder without making a backup' {
     Remove-Item -LiteralPath $script:Plugin

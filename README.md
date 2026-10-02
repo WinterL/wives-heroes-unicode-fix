@@ -2,7 +2,9 @@
 
 English · [繁體中文](docs/README.zh-TW.md) · [简体中文](docs/README.zh-CN.md) · [日本語](docs/README.ja.md) · [한국어](docs/README.ko.md)
 
-An unofficial fix for the game's ANSI-to-Unicode startup error on Windows with UTF-8 enabled. [Steam](https://store.steampowered.com/app/4358140/) · [DLsite](https://www.dlsite.com/maniax/work/=/product_id/RJ01464205.html)
+**Keep your current system locale and UTF-8 setting. No need to switch the system locale to Japanese for this game.**
+
+The [Steam store](https://store.steampowered.com/app/4358140/) requires a Japanese system locale. This unofficial fix addresses the ANSI-to-Unicode startup error within three game files, using CP932 script decoding and an ASCII font name. [Official troubleshooting](https://store.steampowered.com/news/app/4358140/view/717917724409331753?l=tchinese) · [DLsite](https://www.dlsite.com/maniax/work/=/product_id/RJ01464205.html)
 
 ## Install
 
@@ -26,6 +28,6 @@ Windowed main menu and music work; **fullscreen still goes black**. Full gamepla
 
 ## Restore and credits
 
-Put [Restore.cmd](Restore.cmd) in the game folder and run it with the game closed. Keep `.unicode-fix-backup`; before reapplying after a restore, move that backup outside the game folder.
+Put [Restore.cmd](Restore.cmd) in the game folder and run it with the game closed. A successful restore removes the backup; you can apply the patch again directly.
 
 Plugin: [utf8hack](https://github.com/uyjulian/utf8hack), originally by **miahmie** ([original source](https://github.com/krkrz/krkr2/tree/master/kirikiri2/trunk/kirikiri2/src/plugins/win32/utf8hack)). This project's code and documentation use [MIT](LICENSE); see [notices](docs/THIRD_PARTY_NOTICES.md) for third-party licensing. For concerns or removal requests, use [Issues](https://github.com/WinterL/wives-heroes-unicode-fix/issues).

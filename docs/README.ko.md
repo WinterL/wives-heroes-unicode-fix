@@ -2,7 +2,9 @@
 
 [English](../README.md) · [繁體中文](README.zh-TW.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · 한국어
 
-Windows에서 UTF-8을 켰을 때 게임 실행 중 발생하는 ANSI → Unicode 변환 오류를 수정하는 비공식 패치입니다. [Steam](https://store.steampowered.com/app/4358140/) · [DLsite](https://www.dlsite.com/maniax/work/=/product_id/RJ01464205.html)
+**기존 시스템 로캘과 UTF-8 설정을 유지하며, 이 게임을 위해 시스템 로캘을 일본어로 바꾸지 않아도 됩니다.**
+
+[Steam 공식 설명](https://store.steampowered.com/app/4358140/)은 일본어 시스템 로캘을 요구합니다. 이 비공식 패치는 게임 파일 3개를 변경하여 스크립트를 CP932로 읽고 글꼴 이름을 ASCII로 바꿔 ANSI → Unicode 실행 오류를 해결합니다. [공식 문제 해결 안내](https://store.steampowered.com/news/app/4358140/view/717917724409331753?l=tchinese) · [DLsite](https://www.dlsite.com/maniax/work/=/product_id/RJ01464205.html)
 
 ## 설치
 
@@ -26,6 +28,6 @@ Steam build **25049578**: 본편 **0.26.6.22**, Patch 1 **1.26.6.12**, Patch 2 *
 
 ## 복원 및 라이선스
 
-[Restore.cmd](../Restore.cmd)를 게임 폴더에 넣고 게임 종료 후 실행합니다. `.unicode-fix-backup`은 보관하세요. 복원 후 다시 적용하려면 먼저 이 백업을 게임 폴더 밖으로 옮깁니다.
+[Restore.cmd](../Restore.cmd)를 게임 폴더에 넣고 게임 종료 후 실행합니다. 복원에 성공하면 백업이 삭제되며 패치를 바로 다시 적용할 수 있습니다.
 
 플러그인: [utf8hack](https://github.com/uyjulian/utf8hack), 원작자 **miahmie** ([원본 소스](https://github.com/krkrz/krkr2/tree/master/kirikiri2/trunk/kirikiri2/src/plugins/win32/utf8hack)). 프로젝트 코드와 문서는 [MIT](../LICENSE)를 따릅니다. 타사 라이선스는 [제3자 고지](THIRD_PARTY_NOTICES.md)를 참고하세요. 문의나 삭제 요청은 [Issues](https://github.com/WinterL/wives-heroes-unicode-fix/issues)로 보내 주세요.
