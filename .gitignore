@@ -1,14 +1,26 @@
-__pycache__/
-*.pyc
+# Game files, third-party downloads, and generated packages
 *.exe
 *.dll
 *.tpm
 *.xp3
 *.zip
 *.7z
+*.cf
+*.kdt
+*.ksd
+*.kep
+*.dmp
+
+# Local saves, backups, and diagnostics
 *.log
 savedata/
 .unicode-fix-backup/
+.fullscreen-dpi-backup.json
 work/
+outputs/
 .env
+.env.*
 *.tmp
+*.bak
+__pycache__/
+*.pyc

@@ -1,0 +1,31 @@
+# 致曾是勇者的人妻们 — 启动补丁
+
+[English](../README.md) · [繁體中文](README.zh-TW.md) · 简体中文 · [日本語](README.ja.md) · [한국어](README.ko.md)
+
+非官方补丁，解决 Windows 启用 UTF-8 时游戏启动出现的 ANSI 转 Unicode 错误。[Steam](https://store.steampowered.com/app/4358140/) · [DLsite](https://www.dlsite.com/maniax/work/=/product_id/RJ01464205.html)
+
+## 安装
+
+1. 下载 [Apply.cmd](../Apply.cmd)（文件页右上角下载按钮）。再从 [utf8hack v1.2.0](https://github.com/uyjulian/utf8hack/releases/tag/v1.2.0) 下载 `utf8hack.intel32.clang.7z`，解压取出 `utf8hack.dll`。
+2. 在 Steam 中右键点击游戏 → **管理 → 浏览本地文件**，放入 `Apply.cmd` 和 `utf8hack.dll`。
+3. 关闭游戏，双击 **Apply.cmd**，完成后从 Steam 启动。
+
+## 原理
+
+| 文件 | 修改内容 |
+|---|---|
+| `utf8hack.tpm` | 由 `utf8hack.dll` 复制而来，让引擎加载插件。 |
+| `yuusyatsuma.cf` | 指定 `Shift_JIS`，让插件以 CP932 读取脚本。 |
+| `yuusyatsuma.eXe` | 将字体名称 `ＭＳ Ｐゴシック` 改为 `MS PGothic`，避开另一处编码错误。 |
+
+## 测试范围
+
+Steam build **25049578**：本体 **0.26.6.22**、Patch 1 **1.26.6.12**、Patch 2 **2.26.7.23**。测试环境：Windows **11 Pro 25H2（26200.9457）、x64**；系统区域 **zh-TW**，代码页 **UTF-8（65001）**。
+
+窗口模式主菜单与音乐正常；**全屏仍会黑屏**，完整游玩和存读档未测试。EXE／插件哈希不匹配只警告。[测试详情](TESTING.md)
+
+## 还原与许可
+
+将 [Restore.cmd](../Restore.cmd) 放入游戏文件夹，关闭游戏后运行。请保留 `.unicode-fix-backup`；还原后如需重新应用，先将这份备份移到游戏文件夹外。
+
+插件：[utf8hack](https://github.com/uyjulian/utf8hack)，原作者 **miahmie**（[原始源码](https://github.com/krkrz/krkr2/tree/master/kirikiri2/trunk/kirikiri2/src/plugins/win32/utf8hack)）。本项目代码与文档采用 [MIT](../LICENSE)；其他许可见[第三方声明](THIRD_PARTY_NOTICES.md)。如有疑虑，请通过 [Issues](https://github.com/WinterL/wives-heroes-unicode-fix/issues) 提出移除请求。
