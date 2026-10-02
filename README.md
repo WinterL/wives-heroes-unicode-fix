@@ -29,8 +29,8 @@ The game versions were read from local version metadata used by the title-screen
 
 ## Installation for beginners
 
-1. Close the game. Own and install the game through Steam. Get [Python 3.10 or newer for Windows](https://www.python.org/downloads/windows/) if needed; include its launcher / PATH option during installation. The patcher was tested with Python 3.13.12.
-2. Download this repository with **Code → Download ZIP**, then **Extract All**. Do not run it inside the ZIP.
+1. Close the game. Windows 10/11 include Windows PowerShell 5.1; [Python is not required](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_windows_powershell_5.1?view=powershell-5.1).
+2. Download this repository with **Code → Download ZIP**. If Windows marks the ZIP as blocked, right-click it → **Properties → Unblock → Apply**, then **Extract All**. Do not run it inside the ZIP.
 3. Open [upstream release v1.2.0](https://github.com/uyjulian/utf8hack/releases/tag/v1.2.0). Download **`utf8hack.intel32.clang.7z`** and extract it with [7-Zip](https://www.7-zip.org/) or another compatible extractor. Keep the extracted **`utf8hack.dll`**. The plugin is intentionally not included here.
 4. In Steam, right-click the game → **Manage → Browse local files**. Note that folder; it contains `yuusyatsuma.eXe` and `data.xp3`.
 5. Double-click **`Apply.cmd`** in this repository. In the first picker, select the **game folder**. In the next picker, select the **extracted `utf8hack.dll`**. Confirm the installation. The dialogs are in English. Hash verification may take a little time because it reads all game archives.
@@ -60,16 +60,18 @@ The plugin fixes script decoding, but alone still failed during native Layer ini
 - Steam updates or **Verify integrity** may replace patched files; an added plugin may remain. Do not apply an old patch blindly to a new build.
 - This is an experimental runtime plugin. Do not disable security protection if it is blocked; investigate the report and upstream provenance.
 
+The launcher uses Windows PowerShell and your existing execution policy; it does not change system policies or use Bypass. If organizational policy blocks scripts, follow your administrator's approved procedure.
+
 ## Command line and tests
 
 ```text
-python patch.py check --game-dir "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes"
-python patch.py apply --game-dir "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes" --plugin "D:\Downloads\utf8hack.dll"
-python patch.py restore --game-dir "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes"
-python -m unittest -v test_patch.py
+powershell.exe -NoProfile -File .\patch.ps1 -Action check -GameDirectory "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes"
+powershell.exe -NoProfile -File .\patch.ps1 -Action apply -GameDirectory "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes" -PluginPath "D:\Downloads\utf8hack.dll"
+powershell.exe -NoProfile -File .\patch.ps1 -Action restore -GameDirectory "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes"
+powershell.exe -NoProfile -File .\test_patch.ps1
 ```
 
-These are example paths; select your actual paths. `check` does not modify files. [TESTING.md](TESTING.md) explains the test scope and the optional private integration test.
+These are example paths; select your actual paths. `-Action check` does not modify files. [TESTING.md](TESTING.md) explains the test scope and the optional private integration test.
 
 ## License, privacy and removal requests
 

@@ -29,8 +29,8 @@
 
 ## 新手安装步骤
 
-1. 关闭游戏，并确保已合法购买、安装 Steam 游戏。需要 [Windows 版 Python 3.10 或更新版本](https://www.python.org/downloads/windows/)，安装时包含 launcher／PATH 选项；本工具使用 Python 3.13.12 测试。
-2. 在本仓库选择 **Code → Download ZIP**，下载后右键选择**全部解压缩**，不要直接在压缩包里运行。
+1. 关闭游戏。Windows 10／11 自带 Windows PowerShell 5.1，**不需要安装 Python**。
+2. 在本仓库选择 **Code → Download ZIP**。如果 Windows 标记 ZIP 为已阻止，右键 → **属性 → 解除锁定 → 应用**，再**全部解压缩**。不要在 ZIP 内直接运行。
 3. 从 [utf8hack v1.2.0](https://github.com/uyjulian/utf8hack/releases/tag/v1.2.0) 下载 **`utf8hack.intel32.clang.7z`**，用 [7-Zip](https://www.7-zip.org/) 等兼容工具解压，保留 **`utf8hack.dll`**。本仓库不附带插件二进制文件。
 4. Steam 中右键点击游戏 → **管理 → 浏览本地文件**，记下包含 `yuusyatsuma.eXe` 和 `data.xp3` 的文件夹。
 5. 双击本仓库的 **`Apply.cmd`**。先选择**游戏文件夹**，再选择解压出来的 **`utf8hack.dll`**，确认安装。对话框为英文。校验大型数据包需要一点时间。
@@ -60,16 +60,18 @@
 - Steam 更新／验证完整性可能覆盖修补后的 EXE 和配置，但留下新增插件。更新后不要盲目使用旧补丁。
 - 此插件是实验性运行时修补；如果被安全软件拦截，请核查来源和警报，不要关闭防护。
 
+启动器使用 Windows PowerShell 和现有执行策略，不修改系统策略，也不使用 Bypass。若组织策略禁止脚本，请按管理员批准的方式处理。
+
 ## 命令行与测试
 
 ```text
-python patch.py check --game-dir "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes"
-python patch.py apply --game-dir "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes" --plugin "D:\Downloads\utf8hack.dll"
-python patch.py restore --game-dir "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes"
-python -m unittest -v test_patch.py
+powershell.exe -NoProfile -File .\patch.ps1 -Action check -GameDirectory "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes"
+powershell.exe -NoProfile -File .\patch.ps1 -Action apply -GameDirectory "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes" -PluginPath "D:\Downloads\utf8hack.dll"
+powershell.exe -NoProfile -File .\patch.ps1 -Action restore -GameDirectory "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes"
+powershell.exe -NoProfile -File .\test_patch.ps1
 ```
 
-请将示例路径替换为自己的路径。`check` 不会修改文件。[TESTING.md](TESTING.md) 说明测试边界及可选的本地集成测试。
+请将示例路径替换为自己的路径。`-Action check` 不会修改文件。[TESTING.md](TESTING.md) 说明测试边界及可选的本地集成测试。
 
 ## 许可、隐私与删除请求
 

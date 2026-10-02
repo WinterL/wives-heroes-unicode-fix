@@ -29,8 +29,8 @@
 
 ## 不熟電腦也能照做的安裝步驟
 
-1. 關閉遊戲，並確保已合法購買、安裝 Steam 遊戲。若尚未安裝，從 [Python 官方網站](https://www.python.org/downloads/windows/) 安裝 Windows 版 Python 3.10 以上，包含 launcher／加入 PATH 選項。本工具以 Python 3.13.12 測試。
-2. 在本專案按 **Code → Download ZIP**，下載後按右鍵 → **全部解壓縮**。不要直接在 ZIP 裡執行。
+1. 關閉遊戲。Windows 10／11 已內建 Windows PowerShell 5.1，**不需安裝 Python**。
+2. 在本專案按 **Code → Download ZIP**。若 ZIP 被 Windows 標記為封鎖，右鍵 → **內容 → 解除封鎖 → 套用**，再**全部解壓縮**。不要直接在 ZIP 裡執行。
 3. 開啟 [utf8hack v1.2.0 發布頁](https://github.com/uyjulian/utf8hack/releases/tag/v1.2.0)，下載 **`utf8hack.intel32.clang.7z`**。使用 [7-Zip](https://www.7-zip.org/) 或其他相容工具解壓縮，保留裡面的 **`utf8hack.dll`**。本專案不內附外掛。
 4. 在 Steam 對遊戲按右鍵 → **管理 → 瀏覽本機檔案**，記下這個含有 `yuusyatsuma.eXe`、`data.xp3` 的資料夾。
 5. 雙擊本專案的 **`Apply.cmd`**。第一個選擇視窗選**遊戲資料夾**，下一個選擇視窗選剛解壓縮的 **`utf8hack.dll`**，然後確認。工具介面是英文；核對大型資料包雜湊需要一些時間。
@@ -60,16 +60,18 @@
 - Steam 更新或驗證完整性可能還原 EXE／設定，但保留新增外掛。更新後不要直接套用舊補丁。
 - 外掛屬於實驗性執行期修補；若遭安全軟體阻擋，不要關閉防護，應確認警示與上游來源。
 
+啟動器使用 Windows PowerShell 與既有執行原則，不更改系統原則，也不使用 Bypass。若組織原則禁止腳本，請依管理員允許的方式處理。
+
 ## 指令列與測試
 
 ```text
-python patch.py check --game-dir "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes"
-python patch.py apply --game-dir "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes" --plugin "D:\Downloads\utf8hack.dll"
-python patch.py restore --game-dir "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes"
-python -m unittest -v test_patch.py
+powershell.exe -NoProfile -File .\patch.ps1 -Action check -GameDirectory "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes"
+powershell.exe -NoProfile -File .\patch.ps1 -Action apply -GameDirectory "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes" -PluginPath "D:\Downloads\utf8hack.dll"
+powershell.exe -NoProfile -File .\patch.ps1 -Action restore -GameDirectory "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes"
+powershell.exe -NoProfile -File .\test_patch.ps1
 ```
 
-以上是範例路徑，請改成自己的位置。`check` 只檢查、不修改。[TESTING.md](TESTING.md) 說明測試範圍及可選的本機整合測試。
+以上是範例路徑，請改成自己的位置。`-Action check` 只檢查、不修改。[TESTING.md](TESTING.md) 說明測試範圍及可選的本機整合測試。
 
 ## 授權、隱私與移除請求
 

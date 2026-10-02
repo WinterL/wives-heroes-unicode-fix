@@ -29,8 +29,8 @@ Windows Steam판 **To the Wives Who Were Heroes / かつて勇者だった妻達
 
 ## 처음 사용하는 분을 위한 설치 방법
 
-1. 게임을 종료하고 정식으로 구입한 Steam판이 설치되어 있는지 확인하세요. [Windows용 Python 3.10 이상](https://www.python.org/downloads/windows/)이 필요합니다. 설치 시 launcher／PATH 옵션을 포함하세요. 도구는 Python 3.13.12로 테스트했습니다.
-2. 이 저장소에서 **Code → Download ZIP**을 선택하고 다운로드한 파일을 우클릭하여 **모두 추출**하세요. ZIP 안에서 바로 실행하지 마세요.
+1. 게임을 종료하세요. Windows 10／11에는 Windows PowerShell 5.1이 포함되어 있으므로 **Python을 설치할 필요가 없습니다**.
+2. **Code → Download ZIP**으로 받으세요. ZIP이 차단되어 있다면 우클릭 → **속성 → 차단 해제 → 적용** 후 **모두 추출**하세요. ZIP 안에서 직접 실행하지 마세요.
 3. [utf8hack v1.2.0 릴리스](https://github.com/uyjulian/utf8hack/releases/tag/v1.2.0)에서 **`utf8hack.intel32.clang.7z`**를 다운로드하세요. [7-Zip](https://www.7-zip.org/) 등으로 압축을 풀어 **`utf8hack.dll`**을 준비하세요. 플러그인 바이너리는 이 저장소에 포함하지 않습니다.
 4. Steam에서 게임 우클릭 → **관리 → 로컬 파일 탐색**을 선택하세요. `yuusyatsuma.eXe`와 `data.xp3`가 있는 폴더를 확인하세요.
 5. 저장소의 **`Apply.cmd`**를 더블 클릭하세요. 첫 창에서는 **게임 폴더**, 다음 창에서는 압축을 푼 **`utf8hack.dll`**을 선택하고 적용을 확인하세요. 대화상자는 영어입니다. 큰 데이터 파일의 해시 검사에는 시간이 조금 걸립니다.
@@ -60,16 +60,18 @@ Windows 언어 변경이나 재부팅은 필요하지 않습니다. 도구는 �
 - Steam 업데이트나 무결성 검사는 EXE와 설정을 되돌리지만 추가 플러그인은 남길 수 있습니다. 새 빌드에 이전 패치를 무작정 적용하지 마세요.
 - 실험용 런타임 플러그인입니다. 보안 프로그램이 차단하면 보호 기능을 끄지 말고 경고와 출처를 확인하세요.
 
+실행 파일은 Windows PowerShell과 기존 실행 정책을 사용하며 시스템 정책 변경이나 Bypass를 적용하지 않습니다. 조직 정책이 스크립트를 금지한다면 관리자가 승인한 절차를 따르세요.
+
 ## 명령줄과 테스트
 
 ```text
-python patch.py check --game-dir "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes"
-python patch.py apply --game-dir "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes" --plugin "D:\Downloads\utf8hack.dll"
-python patch.py restore --game-dir "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes"
-python -m unittest -v test_patch.py
+powershell.exe -NoProfile -File .\patch.ps1 -Action check -GameDirectory "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes"
+powershell.exe -NoProfile -File .\patch.ps1 -Action apply -GameDirectory "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes" -PluginPath "D:\Downloads\utf8hack.dll"
+powershell.exe -NoProfile -File .\patch.ps1 -Action restore -GameDirectory "D:\SteamLibrary\steamapps\common\To the Wives Who Were Heroes"
+powershell.exe -NoProfile -File .\test_patch.ps1
 ```
 
-경로는 예시이므로 실제 위치로 바꾸세요. `check`는 파일을 변경하지 않습니다. 테스트 범위와 선택적인 로컬 통합 테스트는 [TESTING.md](TESTING.md)에 설명되어 있습니다.
+경로는 예시이므로 실제 위치로 바꾸세요. `-Action check`는 파일을 변경하지 않습니다. 테스트 범위와 선택적인 로컬 통합 테스트는 [TESTING.md](TESTING.md)에 설명되어 있습니다.
 
 ## 라이선스, 개인정보 및 삭제 요청
 

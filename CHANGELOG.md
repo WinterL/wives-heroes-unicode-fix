@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0 — 2026-10-03 (experimental)
+
+- Replace the Python runtime with Windows PowerShell 5.1 and built-in .NET / Windows Forms.
+- Keep double-click Apply.cmd / Restore.cmd, advisory compatibility hashes, original-file backup, rollback and restore safeguards.
+- Support existing format-1 backups created by the earlier Python tool.
+- Add a native, dependency-free test suite, including byte-for-byte real-EXE patch/restore verification.
+- Update all five READMEs to remove the Python installation requirement.
+- Record the fullscreen hang investigation separately; no fullscreen fix is claimed without reproduction.
+
 ## 0.2.0 — 2026-09-27 (experimental)
 
 - Change tested-version SHA-256 mismatches for EXEs, game archives, and plugins to warnings; continue without a force flag.
