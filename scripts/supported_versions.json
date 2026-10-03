@@ -12,7 +12,8 @@
   "engine_file_version": "2.32.2.426",
   "engine_pe_product_version": "1.0.0.0",
   "exe_original_sha256": "2c7a2231df58d82d9eba7b80038641ad716918f3159540c1f3d1a128d2e361f8",
-  "exe_patched_sha256": "c5bf3867b8617280f2c91c1b7f4ac183202923a200fcff0e414d36c6adb07847",
+  "exe_legacy_patched_sha256": "c5bf3867b8617280f2c91c1b7f4ac183202923a200fcff0e414d36c6adb07847",
+  "exe_patched_sha256": "1206454d5c5daae496b5a2eb619c04dd392865706b1b7b6ddede650c2f107a4a",
   "archives_sha256": {
     "data.xp3": "41b0dc4ebe4f58d2285dcb20d84d45cd7bdbb47f4a0cc08cef4cc2dcab43a3a5",
     "patch_1.xp3": "204ae741649e2d46f75d4aa186ddab2d4b4f42f58cf1c52da12205141d59aea4",

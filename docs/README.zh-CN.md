@@ -1,10 +1,11 @@
-# 致曾是勇者的人妻们 — 启动补丁
+# 致曾是勇者的人妻们 — 启动与全屏补丁
 
 [English](../README.md) · [繁體中文](README.zh-TW.md) · 简体中文 · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-**保留原有系统区域和 UTF-8 设置，不必为这款游戏将系统区域改为日语。**
+- **启动失败**：修复 ANSI 转 Unicode 错误，保留原有系统区域和 UTF-8 设置，不必将系统区域改为日语。
+- **切换全屏后黑屏**：修正高 DPI 缩放导致的分辨率误判，按桌面大小等比例显示，切出再切回游戏也能正常操作。
 
-[Steam 官方说明](https://store.steampowered.com/app/4358140/)要求将系统区域设为日语。本非官方补丁修改三个游戏文件，以 CP932 读取脚本、将字体名称改为 ASCII，解决 ANSI 转 Unicode 的启动错误。[官方排错公告](https://store.steampowered.com/news/app/4358140/view/717917724409331753?l=tchinese) · [DLsite](https://www.dlsite.com/maniax/work/=/product_id/RJ01464205.html)
+本补丁为非官方方案；[Steam 官方说明](https://store.steampowered.com/app/4358140/)要求将系统区域设为日语。[官方排错公告](https://store.steampowered.com/news/app/4358140/view/717917724409331753?l=tchinese) · [DLsite](https://www.dlsite.com/maniax/work/=/product_id/RJ01464205.html)
 
 ## 安装
 
@@ -17,14 +18,14 @@
 | 文件 | 修改内容 |
 |---|---|
 | `utf8hack.tpm` | 由 `utf8hack.dll` 复制而来，让引擎加载插件。 |
-| `yuusyatsuma.cf` | 指定 `Shift_JIS`，让插件以 CP932 读取脚本。 |
-| `yuusyatsuma.eXe` | 将字体名称 `ＭＳ Ｐゴシック` 改为 `MS PGothic`，避开另一处编码错误。 |
+| `yuusyatsuma.cf` | 以 `Shift_JIS`（CP932）读取脚本；全屏按当前桌面分辨率自动等比例放大或缩小，非 16:9 屏幕会留黑边。 |
+| `yuusyatsuma.eXe` | 将 `ＭＳ Ｐゴシック` 改为 ASCII `MS PGothic`，并加入 DPI-aware 声明，消除编码错误与全屏分辨率误判。 |
 
 ## 测试范围
 
-Steam build **25049578**：本体 **0.26.6.22**、Patch 1 **1.26.6.12**、Patch 2 **2.26.7.23**。测试环境：Windows **11 Pro 25H2（26200.9457）、x64**；系统区域 **zh-TW**，代码页 **UTF-8（65001）**。
+Steam build **25049578**：本体 **0.26.6.22**、Patch 1 **1.26.6.12**、Patch 2 **2.26.7.23**。测试环境：Windows **11 Pro 25H2（26200.9457）、x64**；系统区域 **zh-TW**，代码页 **UTF-8（65001）**。屏幕 **3840×2160、缩放 225%**。
 
-窗口模式主菜单与音乐正常；**全屏仍会黑屏**，完整游玩和存读档未测试。EXE／插件哈希不匹配只警告。[测试详情](TESTING.md)
+已从 Steam 正常启动，确认窗口主菜单、音乐、全屏显示、点击与 Alt+Tab 正常。完整游玩、存读档及其他环境未测试。EXE／插件哈希不匹配只警告。[测试详情](TESTING.md)
 
 ## 还原与许可
 

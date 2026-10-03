@@ -20,6 +20,7 @@ $entryPoints = [ordered]@{
 }
 foreach ($action in $entryPoints.Keys) {
     $payload = [IO.File]::ReadAllText((Join-Path $PSScriptRoot ($action.ToLowerInvariant() + '.ps1')))
+    if ($action -eq 'Apply') { $payload = [IO.File]::ReadAllText((Join-Path $PSScriptRoot 'dpi.ps1')) + "`n" + $payload }
     $entry = "`ntry {`n    `$game = [IO.Path]::GetDirectoryName(`$env:UNICODE_FIX_CMD)`n    " + $entryPoints[$action] + "`n} catch {`n    [Console]::Error.WriteLine('ERROR: ' + `$_.Exception.Message)`n    exit 1`n}`n"
     $content = ($header + "`n" + $license + $common + "`n" + $payload + $entry).Replace("`r`n", "`n").Replace("`n", "`r`n")
     [IO.File]::WriteAllText((Join-Path $root ($action + '.cmd')), $content, [Text.Encoding]::ASCII)

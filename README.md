@@ -1,10 +1,11 @@
-# To the Wives Who Were Heroes — Startup fix
+# To the Wives Who Were Heroes — Startup and fullscreen fix
 
 English · [繁體中文](docs/README.zh-TW.md) · [简体中文](docs/README.zh-CN.md) · [日本語](docs/README.ja.md) · [한국어](docs/README.ko.md)
 
-**Keep your current system locale and UTF-8 setting. No need to switch the system locale to Japanese for this game.**
+- **Startup failure:** fixes the ANSI-to-Unicode error while keeping your current system locale and UTF-8 setting, without switching to a Japanese system locale.
+- **Fullscreen black screen:** corrects resolution detection under high DPI scaling, fits the desktop while preserving aspect ratio, and keeps the game usable after switching away and back.
 
-The [Steam store](https://store.steampowered.com/app/4358140/) requires a Japanese system locale. This unofficial fix addresses the ANSI-to-Unicode startup error within three game files, using CP932 script decoding and an ASCII font name. [Official troubleshooting](https://store.steampowered.com/news/app/4358140/view/717917724409331753?l=tchinese) · [DLsite](https://www.dlsite.com/maniax/work/=/product_id/RJ01464205.html)
+This is an unofficial patch. The [Steam store](https://store.steampowered.com/app/4358140/) requires a Japanese system locale. [Official troubleshooting](https://store.steampowered.com/news/app/4358140/view/717917724409331753?l=tchinese) · [DLsite](https://www.dlsite.com/maniax/work/=/product_id/RJ01464205.html)
 
 ## Install
 
@@ -17,14 +18,14 @@ The [Steam store](https://store.steampowered.com/app/4358140/) requires a Japane
 | File | Change |
 |---|---|
 | `utf8hack.tpm` | A copy of `utf8hack.dll` that loads as an engine plugin. |
-| `yuusyatsuma.cf` | Sets `Shift_JIS` so the plugin reads scripts using CP932. |
-| `yuusyatsuma.eXe` | Changes the font name from `ＭＳ Ｐゴシック` to `MS PGothic`, avoiding another encoding error. |
+| `yuusyatsuma.cf` | Uses `Shift_JIS` (CP932) for scripts; fullscreen automatically fits the current desktop resolution while preserving aspect ratio, with borders on non-16:9 screens. |
+| `yuusyatsuma.eXe` | Changes `ＭＳ Ｐゴシック` to ASCII `MS PGothic` and adds a DPI-aware declaration, preventing encoding errors and incorrect fullscreen resolution detection. |
 
 ## Tested
 
-Steam build **25049578**: base **0.26.6.22**, Patch 1 **1.26.6.12**, Patch 2 **2.26.7.23**. Tested on Windows **11 Pro 25H2 (26200.9457), x64**, system locale **zh-TW**, code page **UTF-8 (65001)**.
+Steam build **25049578**: base **0.26.6.22**, Patch 1 **1.26.6.12**, Patch 2 **2.26.7.23**. Tested on Windows **11 Pro 25H2 (26200.9457), x64**, system locale **zh-TW**, code page **UTF-8 (65001)**. Display: **3840×2160, 225% scaling**.
 
-Windowed main menu and music work; **fullscreen still goes black**. Full gameplay and save/load are untested. EXE/plugin hash mismatches only warn. [Test details](docs/TESTING.md)
+Normal Steam launch, windowed main menu/music, fullscreen display, clicks and Alt+Tab verified. Full gameplay, save/load and other environments are untested. EXE/plugin hash mismatches only warn. [Test details](docs/TESTING.md)
 
 ## Restore and credits
 

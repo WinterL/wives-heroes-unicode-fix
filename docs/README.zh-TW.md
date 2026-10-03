@@ -1,10 +1,11 @@
-# 致曾是勇者的人妻們 — 啟動修補
+# 致曾是勇者的人妻們 — 啟動與全螢幕修補
 
 [English](../README.md) · 繁體中文 · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-**保留原本系統語系與 UTF-8 設定，不必為這款遊戲切換成日文系統語系。**
+- **啟動失敗**：修正 ANSI 轉 Unicode 錯誤，保留原本系統語系與 UTF-8 設定，不必改成日文系統語系。
+- **全螢幕黑畫面**：修正高 DPI 縮放造成的解析度誤判，按桌面大小等比例顯示，切出再切回遊戲也能正常操作。
 
-[Steam 官方說明](https://store.steampowered.com/app/4358140/)要求使用日文系統語系。本非官方修補改動三個遊戲檔案，以 CP932 讀取腳本、將字型名稱改為 ASCII，解決 ANSI 轉 Unicode 的啟動錯誤。[官方排錯公告](https://store.steampowered.com/news/app/4358140/view/717917724409331753?l=tchinese) · [DLsite](https://www.dlsite.com/maniax/work/=/product_id/RJ01464205.html)
+本修補為非官方方案；[Steam 官方說明](https://store.steampowered.com/app/4358140/)要求使用日文系統語系。[官方排錯公告](https://store.steampowered.com/news/app/4358140/view/717917724409331753?l=tchinese) · [DLsite](https://www.dlsite.com/maniax/work/=/product_id/RJ01464205.html)
 
 ## 安裝
 
@@ -17,14 +18,14 @@
 | 檔案 | 修改內容 |
 |---|---|
 | `utf8hack.tpm` | 由 `utf8hack.dll` 複製而來，讓引擎載入外掛。 |
-| `yuusyatsuma.cf` | 指定 `Shift_JIS`，讓外掛以 CP932 讀取腳本。 |
-| `yuusyatsuma.eXe` | 將字型名稱 `ＭＳ Ｐゴシック` 改為 `MS PGothic`，避開另一處編碼錯誤。 |
+| `yuusyatsuma.cf` | 以 `Shift_JIS`（CP932）讀取腳本；全螢幕依當前桌面解析度自動等比例放大或縮小，非 16:9 螢幕會留黑邊。 |
+| `yuusyatsuma.eXe` | 將 `ＭＳ Ｐゴシック` 改為 ASCII `MS PGothic`，並加入 DPI-aware 宣告，排除編碼錯誤與全螢幕解析度誤判。 |
 
 ## 測試範圍
 
-Steam build **25049578**：本體 **0.26.6.22**、Patch 1 **1.26.6.12**、Patch 2 **2.26.7.23**。實測環境：Windows **11 Pro 25H2（26200.9457）、x64**；系統語系 **zh-TW**，字碼頁 **UTF-8（65001）**。
+Steam build **25049578**：本體 **0.26.6.22**、Patch 1 **1.26.6.12**、Patch 2 **2.26.7.23**。實測環境：Windows **11 Pro 25H2（26200.9457）、x64**；系統語系 **zh-TW**，字碼頁 **UTF-8（65001）**。螢幕 **3840×2160、縮放 225%**。
 
-視窗模式主選單與音樂正常；**全螢幕仍會黑畫面**，完整遊玩與存讀檔未測。EXE／外掛雜湊不符只警告。[測試詳情](TESTING.md)
+已從 Steam 正常啟動，確認視窗主選單、音樂、全螢幕顯示、點擊與 Alt+Tab 正常。完整遊玩、存讀檔及其他環境未測。EXE／外掛雜湊不符只警告。[測試詳情](TESTING.md)
 
 ## 還原與授權
 

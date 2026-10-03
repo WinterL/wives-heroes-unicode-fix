@@ -54,7 +54,7 @@ function Write-AtomicFile([string]$Path, [byte[]]$Bytes) {
         if ([IO.File]::Exists($Path)) { [IO.File]::Replace($temporary, $Path, [NullString]::Value) }
         else { [IO.File]::Move($temporary, $Path) }
     } finally {
-        if ([IO.File]::Exists($temporary)) { [IO.File]::Delete($temporary) }
+        [IO.File]::Delete($temporary)
     }
 }
 
@@ -73,19 +73,18 @@ function Get-GameDirectory([string]$Path) {
     return $directory.FullName
 }
 
-function Restore-GamePatch([string]$Folder) {
-    $game = Get-GameDirectory $Folder
-    $backup = Join-Path $game $script:BackupName
-    if (-not (Test-Path -LiteralPath $backup)) { return 'No backup found. Nothing to restore.' }
-    $backupItem = Get-Item -LiteralPath $backup
-    if (-not $backupItem.PSIsContainer -or $backupItem.FullName -ne $backup -or ($backupItem.Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw 'Backup must be a normal directory directly inside the game folder.' }
+function Read-PatchBackup([string]$Game) {
+    $backup = Join-Path $Game $script:BackupName
+    $item = Get-Item -LiteralPath $backup
+    if (-not $item.PSIsContainer -or $item.FullName -ne $backup -or ($item.Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw 'Backup must be a normal directory directly inside the game folder.' }
     $entries = @(Get-ChildItem -LiteralPath $backup -Force)
     foreach ($entry in $entries) {
         if ($entry.PSIsContainer -or ($entry.Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw 'Backup contains a directory or symbolic link; no files changed.' }
     }
     $manifestPath = Join-Path $backup 'manifest.json'
     try {
-        $manifest = Get-Content -LiteralPath $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
+        $manifestBytes = [IO.File]::ReadAllBytes($manifestPath)
+        $manifest = [Text.Encoding]::UTF8.GetString($manifestBytes).TrimStart([char]0xFEFF) | ConvertFrom-Json
         if ($manifest.format -ne 1) { throw 'Invalid format' }
         foreach ($section in @('before','after')) {
             $names = @($manifest.$section.PSObject.Properties.Name | Sort-Object)
@@ -99,16 +98,28 @@ function Restore-GamePatch([string]$Folder) {
     } catch { throw 'A valid backup manifest is required.' }
     $ownedNames = @($script:FileNames | Where-Object { $null -ne $manifest.before.$_ }) + @('manifest.json')
     if ((@($entries.Name | Sort-Object) -join '|') -ne (($ownedNames | Sort-Object) -join '|')) { throw 'Backup contains unexpected or missing files; no files changed.' }
-    $manifestBytes = [IO.File]::ReadAllBytes($manifestPath)
     $originals = @{}
     foreach ($name in $script:FileNames) {
         $expected = $manifest.before.$name
-        $data = if ($null -ne $expected) { [IO.File]::ReadAllBytes((Join-Path $backup $name)) } else { $null }
-        if ($null -ne $data -and (Get-BytesHash $data) -ne $expected) { throw ('Backup checksum mismatch: ' + $name) }
+        $originals[$name] = if ($null -ne $expected) { [IO.File]::ReadAllBytes((Join-Path $backup $name)) } else { $null }
+        if ($null -ne $originals[$name] -and (Get-BytesHash $originals[$name]) -ne $expected) { throw ('Backup checksum mismatch: ' + $name) }
+    }
+    return @{ Manifest=$manifest; Bytes=$manifestBytes; Originals=$originals; Names=$ownedNames }
+}
+
+function Restore-GamePatch([string]$Folder) {
+    $game = Get-GameDirectory $Folder
+    $backup = Join-Path $game $script:BackupName
+    if (-not (Test-Path -LiteralPath $backup)) { return 'No backup found. Nothing to restore.' }
+    $saved = Read-PatchBackup $game
+    $manifest = $saved.Manifest
+    $ownedNames = $saved.Names
+    $originals = $saved.Originals
+    foreach ($name in $script:FileNames) {
+        $expected = $manifest.before.$name
         $currentBytes = Read-OptionalFile (Join-Path $game $name)
         $current = if ($null -ne $currentBytes) { Get-BytesHash $currentBytes } else { $null }
         if ($current -ne $expected -and $current -ne $manifest.after.$name) { throw ('File changed after installation; restore stopped to preserve it: ' + $name) }
-        $originals[$name] = $data
     }
     foreach ($name in $script:FileNames) {
         Write-AtomicFile (Join-Path $game $name) $originals[$name]
@@ -127,7 +138,7 @@ function Restore-GamePatch([string]$Folder) {
             foreach ($name in $ownedNames) {
                 $path = Join-Path $backup $name
                 if (-not [IO.File]::Exists($path)) {
-                    $bytes = if ($name -eq 'manifest.json') { $manifestBytes } else { $originals[$name] }
+                    $bytes = if ($name -eq 'manifest.json') { $saved.Bytes } else { $originals[$name] }
                     Write-AtomicFile $path $bytes
                 }
             }
