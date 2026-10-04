@@ -3,6 +3,8 @@
 *.dll
 *.tpm
 *.xp3
+# Only the reviewed voice overlay is included.
+!/patch_3.xp3
 *.zip
 *.7z
 *.cf

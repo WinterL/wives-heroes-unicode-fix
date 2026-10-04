@@ -1,0 +1,231 @@
+To the Wives Who Were Heroes — Voice patch report
+
+Summary
+Restore missing Japanese dialogue voices and history replay in the English,
+Traditional Chinese, Simplified Chinese and Korean scenarios, using the Japanese
+dialogue as the reference. Existing earlier Chinese translations are restored
+where text was missing; no new dialogue is written. Japanese scenarios, audio,
+artwork, the engine, executable and saves are unchanged. Original script
+encoding, line endings and line counts are preserved.
+
+Method and scope
+Target: Steam build 25049578, base 0.26.6.22, Patch 1 1.26.6.12,
+Patch 2 2.26.7.23. Other builds have not been checked.
+
+Cross-reference each localized scenario with the Japanese dialogue: voice IDs,
+their order, parameters, and the corresponding text/wait boundaries. Restore
+disabled matching cues and correct obsolete or wrong references. Recover two
+missing Chinese dialogue lines, including their waits, from the existing earlier
+game archive. Repair one malformed Korean tag that stops scenario parsing.
+
+The overlay contains 54 translated scenario scripts and 985 changed lines.
+These totals include the opening Demon Queen fix. They are edit counts, not
+counts of unique spoken lines. English: 3 files / 6 lines; Traditional Chinese:
+5 / 8; Simplified Chinese: 5 / 8; Korean: 41 / 963.
+
+Japanese-present voice cues were compared across all 249 scenario groups and
+four translations. The patch leaves no missing expected static voice cues in
+that comparison. Playback and history-replay dispatch were checked with the
+game's parser; this is not a full-route playthrough or a listening test.
+
+Change codes used in the complete file list below
+A — Enable an existing, commented-out matching voice cue: 942 lines.
+B — Enable a cue and replace its obsolete voice filename: 38 lines.
+    Opening, EN/zh-CN/zh-TW (three cues each):
+    cv_02ev15501_155_01.ogg -> cv_00op001_207_01.ogg
+    cv_02ev15501_155_03.ogg -> cv_00op001_207_02.ogg
+    cv_05loop_155_010a.ogg  -> cv_00op001_207_03.ogg
+    Korean 01_ed_216: 29 disabled cv_01ed206_206_* references are replaced
+    with the corresponding Japanese cv_01ed216_206_* references.
+C — Correct a wrong active filename in both Chinese 03_ap_216_21 scripts:
+    cv_03ap21622_206_13.ogg -> cv_03ap21621_206_13.ogg (2 lines).
+D — Restore line 200 of both Chinese 03_ap_213_11 scripts from patch_1:
+    existing translated dialogue plus its [落] and [待] tags (2 lines).
+E — Add the missing ] in the Korean questionnaire's [endindent tag,
+    preserving the surrounding Korean text (1 line).
+
+Installation / removal
+Close the game and place patch_3.xp3 beside yuusyatsuma.eXe. The voice fix is
+independent of Apply.cmd and utf8hack. Keep patch_1.xp3 and patch_2.xp3.
+If patch_3.xp3 already exists, keep a backup and check what it contains before
+replacing it; this patch does not merge unrelated scenario mods.
+Restart the game and replay the scene. Existing history entries are not updated.
+To undo this overlay, close the game, remove or rename only this patch_3.xp3,
+and restore any previous patch_3.xp3 you backed up. Restore.cmd handles the
+separate startup/fullscreen fix, not this voice overlay.
+
+Preserved differences
+The extra Korean loop voice in 03_ap_201_12_ko.ks is retained. Unrelated
+background-music/effect filename issues, narration-only pacing differences and
+other text/layout differences are outside this voice patch.
+
+This is an unofficial overlay for an existing game installation. Game scenario
+content remains subject to its original rights; the project's MIT license for
+original code and documentation does not relicense that content.
+
+Complete changed-file list
+Line numbers refer to the original scenario files and remain unchanged.
+Only the listed lines differ; no full transcripts or diagnostic logs are included.
+
+00_op_001_en.ks — 3 changed lines
+  B: 16, 20, 215
+
+00_op_001_zh-CN.ks — 3 changed lines
+  B: 16, 20, 215
+
+00_op_001_zh-TW.ks — 3 changed lines
+  B: 16, 20, 215
+
+00_op_006_en.ks — 2 changed lines
+  A: 97, 100
+
+00_op_006_ko.ks — 2 changed lines
+  A: 97, 100
+
+00_op_006_zh-CN.ks — 2 changed lines
+  A: 97, 100
+
+00_op_006_zh-TW.ks — 2 changed lines
+  A: 97, 100
+
+01_ed_203_en.ks — 1 changed line
+  A: 195
+
+01_ed_203_ko.ks — 1 changed line
+  A: 195
+
+01_ed_203_zh-CN.ks — 1 changed line
+  A: 195
+
+01_ed_203_zh-TW.ks — 1 changed line
+  A: 195
+
+アンケート_ko.ks — 42 changed lines
+  A: 7, 16, 19, 27, 40, 52, 63, 73, 84, 97, 109, 120, 131, 142, 153, 164, 178, 194, 203, 213, 222, 233, 242, 257, 268, 279, 297, 315, 330, 344, 373, 389, 407, 429, 440, 450, 462, 472, 482, 495, 553
+  E: 496
+
+00_op_015_ko.ks — 24 changed lines
+  A: 23, 27, 38, 42, 53, 57, 65, 74, 100, 103, 109, 112, 123, 141, 148, 151, 154, 161, 165, 174, 183, 194, 202, 205
+
+00_op_016_ko.ks — 38 changed lines
+  A: 14, 30, 33, 42, 51, 55, 60, 63, 70, 73, 76, 80, 83, 107, 110, 113, 117, 120, 129, 134, 139, 142, 147, 152, 155, 160, 163, 167, 172, 175, 193, 196, 199, 202, 205, 217, 225, 228
+
+01_ed_206_ko.ks — 75 changed lines
+  A: 36, 39, 61, 64, 67, 74, 77, 90, 99, 107, 110, 113, 116, 124, 139, 144, 171, 184, 187, 197, 200, 203, 228, 244, 247, 256, 259, 262, 269, 274, 287, 290, 295, 304, 313, 318, 328, 331, 336, 339, 344, 347, 350, 367, 381, 384, 387, 390, 399, 409, 412, 417, 420, 427, 441, 444, 452, 480, 490, 498, 503, 512, 517, 522, 542, 549, 552, 560, 563, 573, 576, 588, 591, 605, 608
+
+01_ed_216_ko.ks — 29 changed lines
+  B: 68, 71, 78, 81, 89, 120, 131, 140, 149, 152, 157, 165, 168, 171, 178, 181, 184, 192, 195, 198, 203, 212, 221, 224, 227, 239, 242, 251, 261
+
+02_ev_206_01_ko.ks — 10 changed lines
+  A: 13, 22, 25, 28, 37, 40, 43, 48, 51, 61
+
+02_ev_206_02_ko.ks — 17 changed lines
+  A: 30, 39, 42, 49, 60, 66, 69, 132, 135, 140, 143, 148, 151, 156, 162, 174, 178
+
+02_ev_206_03_ko.ks — 18 changed lines
+  A: 72, 91, 102, 105, 125, 131, 134, 137, 140, 143, 146, 153, 156, 161, 178, 187, 190, 222
+
+02_ev_206_04_ko.ks — 27 changed lines
+  A: 25, 39, 57, 80, 150, 157, 176, 180, 189, 192, 201, 205, 209, 224, 230, 237, 260, 263, 266, 272, 275, 287, 290, 294, 319, 322, 327
+
+02_ev_206_05_ko.ks — 27 changed lines
+  A: 33, 45, 64, 67, 89, 92, 121, 130, 133, 146, 151, 157, 162, 167, 170, 184, 189, 192, 195, 199, 203, 209, 212, 220, 223, 234, 237
+
+02_pm_206_01_ko.ks — 4 changed lines
+  A: 21, 28, 33, 58
+
+02_pm_206_02_ko.ks — 5 changed lines
+  A: 22, 27, 31, 37, 63
+
+02_pm_206_03_ko.ks — 5 changed lines
+  A: 22, 27, 30, 35, 60
+
+03_ap_206_11_ko.ks — 40 changed lines
+  A: 15, 24, 34, 49, 58, 67, 70, 79, 88, 97, 101, 104, 109, 112, 115, 122, 125, 128, 135, 138, 141, 148, 151, 154, 161, 168, 177, 180, 183, 194, 207, 210, 215, 220, 223, 236, 241, 246, 268, 271
+
+03_ap_206_12_ko.ks — 24 changed lines
+  A: 16, 28, 46, 53, 66, 70, 80, 83, 86, 97, 100, 107, 115, 129, 132, 142, 145, 150, 154, 160, 164, 167, 187, 193
+
+03_ap_206_21_ko.ks — 18 changed lines
+  A: 17, 37, 44, 50, 60, 63, 79, 82, 92, 105, 113, 116, 125, 128, 136, 155, 167, 177
+
+03_ap_206_22_ko.ks — 19 changed lines
+  A: 18, 47, 56, 69, 76, 79, 82, 93, 104, 107, 110, 126, 133, 146, 159, 168, 189, 194, 197
+
+03_ap_206_31_ko.ks — 16 changed lines
+  A: 19, 54, 57, 64, 67, 82, 109, 116, 127, 130, 149, 152, 175, 190, 206, 240
+
+03_ap_206_32_ko.ks — 25 changed lines
+  A: 19, 22, 43, 46, 61, 64, 87, 90, 103, 106, 109, 124, 127, 134, 154, 163, 174, 177, 190, 219, 237, 257, 260, 268, 273
+
+03_ap_206_41_ko.ks — 26 changed lines
+  A: 19, 30, 63, 70, 73, 76, 83, 100, 103, 112, 115, 128, 131, 146, 161, 164, 175, 178, 181, 196, 199, 202, 216, 225, 235, 260
+
+03_ap_206_42_ko.ks — 23 changed lines
+  A: 29, 51, 60, 75, 88, 93, 112, 123, 126, 141, 144, 151, 154, 168, 171, 182, 196, 199, 215, 218, 253, 256, 267
+
+03_ap_206_43_ko.ks — 21 changed lines
+  A: 24, 49, 58, 80, 88, 105, 108, 121, 140, 147, 156, 163, 174, 177, 191, 210, 215, 231, 234, 239, 259
+
+03_ap_206_44_ko.ks — 29 changed lines
+  A: 22, 30, 36, 41, 44, 60, 71, 76, 83, 88, 91, 103, 110, 133, 147, 166, 185, 188, 191, 200, 203, 206, 220, 223, 232, 235, 255, 271, 292
+
+03_ap_206_51_ko.ks — 26 changed lines
+  A: 22, 45, 66, 69, 76, 79, 88, 93, 109, 112, 115, 134, 145, 166, 169, 178, 185, 188, 197, 202, 205, 227, 230, 235, 260, 270
+
+03_ap_206_52_ko.ks — 28 changed lines
+  A: 15, 22, 42, 53, 70, 83, 93, 104, 107, 120, 137, 152, 155, 164, 171, 183, 194, 197, 206, 218, 221, 243, 254, 259, 262, 267, 278, 281
+
+03_ap_206_53_ko.ks — 27 changed lines
+  A: 17, 26, 50, 65, 74, 84, 89, 102, 107, 117, 122, 137, 153, 156, 165, 170, 189, 199, 204, 216, 221, 232, 239, 257, 265, 274, 279
+
+03_ap_216_11_ko.ks — 27 changed lines
+  A: 15, 18, 32, 39, 56, 67, 74, 83, 86, 89, 94, 103, 108, 111, 132, 141, 144, 149, 154, 169, 174, 185, 192, 201, 232, 237, 242
+
+03_ap_216_12_ko.ks — 16 changed lines
+  A: 20, 24, 27, 73, 80, 89, 102, 115, 118, 127, 139, 150, 157, 169, 190, 198
+
+03_ap_216_21_ko.ks — 14 changed lines
+  A: 17, 36, 51, 58, 61, 75, 92, 101, 114, 134, 137, 140, 174, 183
+
+03_ap_216_21_zh-CN.ks — 1 changed line
+  C: 174
+
+03_ap_216_21_zh-TW.ks — 1 changed line
+  C: 174
+
+03_ap_216_22_ko.ks — 16 changed lines
+  A: 17, 22, 41, 48, 75, 92, 103, 136, 149, 158, 165, 180, 183, 194, 218, 226
+
+03_ap_216_31_ko.ks — 15 changed lines
+  A: 18, 47, 64, 90, 101, 116, 119, 142, 157, 166, 181, 184, 219, 235, 255
+
+03_ap_216_32_ko.ks — 20 changed lines
+  A: 21, 42, 59, 85, 98, 110, 125, 128, 137, 146, 170, 177, 194, 197, 200, 213, 218, 235, 268, 271
+
+03_ap_216_41_ko.ks — 28 changed lines
+  A: 46, 61, 64, 77, 90, 102, 117, 126, 137, 140, 154, 159, 164, 167, 172, 179, 194, 203, 208, 213, 234, 237, 251, 254, 261, 281, 293, 296
+
+03_ap_216_42_ko.ks — 34 changed lines
+  A: 15, 23, 36, 55, 60, 65, 78, 91, 94, 99, 102, 113, 120, 123, 126, 135, 142, 147, 150, 153, 163, 174, 177, 180, 191, 198, 201, 213, 218, 225, 241, 244, 256, 259
+
+03_ap_216_43_ko.ks — 30 changed lines
+  A: 20, 39, 61, 70, 77, 84, 93, 98, 111, 122, 125, 128, 131, 140, 145, 157, 160, 163, 174, 177, 186, 195, 201, 204, 207, 223, 233, 248, 253, 256
+
+03_ap_216_44_ko.ks — 35 changed lines
+  A: 39, 46, 53, 60, 71, 76, 82, 87, 92, 101, 106, 111, 121, 124, 127, 138, 147, 150, 153, 172, 179, 186, 189, 196, 203, 210, 219, 227, 234, 239, 242, 247, 264, 272, 283
+
+03_ap_216_51_ko.ks — 22 changed lines
+  A: 21, 36, 45, 60, 73, 76, 85, 108, 119, 128, 137, 158, 182, 191, 194, 213, 222, 231, 236, 264, 271, 285
+
+03_ap_216_52_ko.ks — 33 changed lines
+  A: 17, 42, 53, 60, 75, 92, 98, 101, 106, 114, 121, 132, 135, 150, 158, 166, 176, 181, 184, 200, 205, 213, 218, 225, 241, 249, 260, 263, 273, 276, 279, 295, 298
+
+03_ap_216_53_ko.ks — 27 changed lines
+  A: 22, 27, 42, 47, 50, 67, 75, 78, 92, 105, 108, 129, 134, 145, 148, 159, 165, 170, 186, 191, 203, 208, 219, 231, 249, 263, 268
+
+03_ap_213_11_zh-CN.ks — 1 changed line
+  D: 200
+
+03_ap_213_11_zh-TW.ks — 1 changed line
+  D: 200

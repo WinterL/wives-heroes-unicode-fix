@@ -1,6 +1,6 @@
 # Third-party notices
 
-[MIT](../LICENSE) covers this project's original code and documentation only. It does not relicense the game, engine, utf8hack or a modified game executable. No game files or third-party binaries are bundled.
+[MIT](../LICENSE) covers this project's original code and documentation only. It does not relicense the game, engine, utf8hack or a modified game executable. `patch_3.xp3` contains modified game scenario scripts; their original rights still apply and they are not relicensed under MIT. No original game archives, audio, artwork, executables or external plugins are bundled.
 
 ## utf8hack
 
