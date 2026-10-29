@@ -26,6 +26,13 @@
     "asset_sha256": "32b94098dbb27ed1021fb8819e63e39b6592ecc903babb5cb3a68e402db73d5f",
     "dll_sha256": "e9bd9a1f354b906b16201a24732d8ffd186cadc30e803dcf33281e297671ea69"
   },
+  "additional_verified_builds": {
+    "26287432": {
+      "verification": "file-level compatibility; no new gameplay test",
+      "patch_2_sha256": "ecab4b304ba0fd1f433f2edc9091eaf06480a27b3dc4875090450bc28f21dd8d",
+      "voice_patch_sha256": "13e88d56ca8eb0a682964e50028dd019b35a5b548ec1fcd8d036c159c800e6fc"
+    }
+  },
   "tested_environment": {
     "os": "Windows 11 Pro",
     "release": "25H2",

@@ -37,6 +37,8 @@ The Japanese scenarios are the reference for corresponding dialogue and voice co
 
 ## Tested
 
+**Update compatibility (2026-10-29):** Steam build **26287432** is also compatible with the existing downloads; no reinstall is needed. All 54 voice-overlay source scripts are unchanged. This is a file-level verification, not a new gameplay test. [Details](docs/TESTING.md#steam-build-26287432-compatibility).
+
 Steam build **25049578**: base **0.26.6.22**, Patch 1 **1.26.6.12**, Patch 2 **2.26.7.23**. Tested on Windows **11 Pro 25H2 (26200.9457), x64**, system locale **zh-TW**, code page **UTF-8 (65001)**. Display: **3840×2160, 225% scaling**.
 
 Normal Steam launch, windowed main menu/music, fullscreen display, clicks and Alt+Tab verified. Full gameplay, save/load and other environments are untested. EXE/plugin hash mismatches only warn. [Test details](docs/TESTING.md)

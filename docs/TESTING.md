@@ -17,6 +17,14 @@ Game versions came from the title-screen version metadata: `data.xp3/image_0/ver
 
 Reference hashes are in [supported_versions.json](../scripts/supported_versions.json). EXE and plugin hash mismatches only warn; archive hashes are reference data and are not checked during installation. Patch-location, backup-integrity and restore-conflict checks remain strict.
 
+## Steam build 26287432 compatibility
+
+File-level verification on 2026-10-29 confirmed compatibility with the existing downloads. Among 4,293 Patch 2 index entries, only `03_ap_203_43_zh-CN.ks` changed by size/checksum: `[振动]` became `[振動]`. That script is not included in the voice overlay. No entries were added or removed.
+
+All 54 overlay source scripts match their previously audited SHA-256 hashes. Rebuilding from the updated game produced the identical `patch_3.xp3` SHA-256: `13e88d56ca8eb0a682964e50028dd019b35a5b548ec1fcd8d036c159c800e6fc`. The installed patched EXE and plugin also retain their reference hashes and the encoding/fullscreen settings remain intact.
+
+The existing `Apply.cmd` does not reject archive versions; its behavior and the downloadable voice overlay need no changes. No reinstall is required. This update did not include a new game launch or gameplay test.
+
 ## Official guidance and this workaround
 
 The [Steam store](https://store.steampowered.com/app/4358140/) requires a Japanese-language environment and half-width alphanumeric paths, and recommends windowed play. The [official troubleshooting notice](https://store.steampowered.com/news/app/4358140/view/717917724409331753?l=tchinese) suggests restarting the game or PC in windowed mode for the shown error, and checking the Japanese system region for misaligned character art. This workaround keeps the tested zh-TW locale and UTF-8 code page unchanged; the character-art issue has not been verified.
